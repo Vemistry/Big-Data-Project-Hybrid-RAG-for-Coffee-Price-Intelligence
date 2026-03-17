@@ -1,167 +1,178 @@
-# 📊 Optimizing Data Pipeline for RAG-based Question Answering on Vietnamese News Data
+# 📊 Big Data Project – Hybrid RAG for Coffee Price Intelligence
+
+## 1. 📄 Bài báo nền tảng (Base Paper)
+
+**Tiêu đề:** RAG+: Enhancing Retrieval-Augmented Generation with Application-Aware Reasoning
+**Hội nghị:** EMNLP 2025 (CORE A)
+**Link:** [https://aclanthology.org/2025.emnlp-main.1630.pdf](https://aclanthology.org/2025.emnlp-main.1630.pdf)
 
 ---
 
-## 🎯 1. Giới thiệu
+## 2. 🧠 Động lực nghiên cứu
 
-Dự án này tập trung xây dựng một hệ thống hỏi đáp (Question Answering) dựa trên mô hình Retrieval-Augmented Generation (RAG), với trọng tâm là **tối ưu hóa pipeline xử lý dữ liệu lớn** từ các nguồn báo chí tiếng Việt.
+Các hệ thống RAG hiện tại:
 
-Khác với các nghiên cứu chỉ tập trung vào mô hình ngôn ngữ, dự án này nhấn mạnh vào:
+* Phụ thuộc vào dữ liệu tĩnh
+* Không xử lý tốt dữ liệu thời gian thực
+* Chưa tổng hợp thông tin từ nhiều nguồn
 
-* Thu thập dữ liệu quy mô lớn
-* Xử lý dữ liệu nhiễu (raw HTML)
-* Tối ưu truy xuất thông tin
-* Đánh giá hiệu năng hệ thống
+Đồ án này mở rộng RAG để:
 
----
-
-## 🧠 2. Bài báo nền tảng
-
-* **RAG+: Enhancing Retrieval-Augmented Generation with Application-Aware Reasoning (EMNLP 2025)**
-
-### 📌 Tóm tắt
-
-Bài báo đề xuất cải tiến RAG bằng cách bổ sung cơ chế reasoning theo ngữ cảnh ứng dụng, giúp nâng cao chất lượng câu trả lời.
-
-### 🎯 Hạn chế
-
-* Chưa tập trung vào dữ liệu thực tế (noisy data)
-* Chưa tối ưu pipeline xử lý dữ liệu lớn
-* Chưa đánh giá ảnh hưởng của preprocessing
+* Hỗ trợ **dữ liệu thời gian thực**
+* Thực hiện **tổng hợp đa nguồn**
+* Tăng độ tin cậy thông qua **trích xuất có cấu trúc**
 
 ---
 
-## 🔍 3. Research Gap
+## 3. 🎯 Bài toán
 
-Hiện tại, các hệ thống RAG:
+Xây dựng hệ thống trả lời câu hỏi như:
 
-* Chưa xử lý tốt dữ liệu HTML nhiễu
-* Chưa tối ưu pipeline cho dữ liệu lớn và đa nguồn
-* Chưa đánh giá sâu về hiệu năng truy xuất (latency, scalability)
+> “Giá cà phê hôm nay là bao nhiêu?”
 
-👉 Dự án này nhằm giải quyết các vấn đề trên.
+Thông qua:
 
----
-
-## 🚀 4. Kiến trúc hệ thống
-
-### 🔹 4.1 Data Ingestion
-
-* Crawl dữ liệu từ các trang báo
-* Lưu trữ raw HTML
-
-### 🔹 4.2 Data Processing
-
-* Làm sạch HTML
-* Loại bỏ noise
-* Chuẩn hóa văn bản
-* Deduplicate dữ liệu
-
-### 🔹 4.3 Indexing & Storage
-
-* Chia nhỏ văn bản (chunking)
-* Tạo embedding
-* Lưu trữ:
-
-  * Vector Database (FAISS / Chroma)
-  * Document Store
-
-### 🔹 4.4 Retrieval
-
-* BM25
-* Vector Search
-* Hybrid Search
-
-### 🔹 4.5 RAG QA System
-
-* Nhận câu hỏi từ người dùng
-* Truy xuất tài liệu liên quan
-* Sinh câu trả lời
+* Truy xuất nhiều nguồn dữ liệu
+* Trích xuất thông tin giá có cấu trúc
+* Tổng hợp thành khoảng giá cuối cùng
 
 ---
 
-## 📊 5. Thực nghiệm
+## 4. 🏗️ Kiến trúc hệ thống
 
-### 🔬 So sánh phương pháp truy xuất
+### Pipeline:
 
-| Method | Accuracy | Latency |
-| ------ | -------- | ------- |
-| BM25   | TBD      | TBD     |
-| Vector | TBD      | TBD     |
-| Hybrid | TBD      | TBD     |
+1. Thu thập dữ liệu (historical + realtime)
+2. Tiền xử lý (làm sạch, chia đoạn)
+3. Lập chỉ mục Vector DB
+4. Xử lý truy vấn
+5. Truy xuất lai (Hybrid Retrieval):
 
----
-
-### 🧪 Các yếu tố đánh giá
-
-* Ảnh hưởng của cleaning
-* Chunk size
-* Top-k retrieval
+   * Vector DB nội bộ
+   * Tìm kiếm web (khi cần)
+6. Tổng hợp & suy luận
+7. Sinh câu trả lời
 
 ---
 
-## 💾 6. Dataset
+## 5. ⚡ Thiết kế Hybrid RAG
 
-* Dữ liệu báo chí tiếng Việt
-* Dạng: raw HTML
-* Nguồn: nhiều website khác nhau
+### Phân loại truy vấn
 
-### 📌 Đặc điểm
+* Truy vấn tĩnh → dùng Vector DB
+* Truy vấn thời gian thực → gọi Web Search
 
-* Dữ liệu nhiễu (noisy)
-* Không đồng nhất
-* Quy mô lớn
+### Nguồn dữ liệu
 
----
-
-## ⚙️ 7. Công nghệ sử dụng
-
-* Python
-* FAISS / ChromaDB
-* BM25 (rank_bm25)
-* LLM API / local model
+* Cơ sở dữ liệu lịch sử (báo đã crawl)
+* Dữ liệu web thời gian thực
 
 ---
 
-## 🎯 8. Mục tiêu
+## 6. 🔄 Xử lý dữ liệu thời gian thực
 
-* Xây dựng pipeline xử lý dữ liệu lớn
-* Tối ưu hiệu năng truy xuất
-* Đánh giá hệ thống RAG trên dữ liệu thực tế
-
----
-
-## 📌 9. Kết luận kỳ vọng
-
-* Hiểu rõ ảnh hưởng của pipeline dữ liệu
-* Đề xuất phương pháp tối ưu retrieval
-* Áp dụng hiệu quả RAG trong bối cảnh dữ liệu lớn
+* Crawl định kỳ (10–60 phút)
+* Lập chỉ mục tăng dần (incremental indexing)
+* Dữ liệu mới được sử dụng ngay
 
 ---
 
-## 👨‍💻 10. Thành viên
+## 7. 🧩 Trích xuất & tổng hợp thông tin
 
-* (Điền tên nhóm)
+Ví dụ dữ liệu trích xuất:
 
----
+[
+{"location": "Lâm Đồng", "price": 118000},
+{"location": "Đắk Lắk", "price": 120000}
+]
 
-## 📅 11. Tiến độ dự kiến
+Tổng hợp:
 
-| Giai đoạn | Nội dung             |
-| --------- | -------------------- |
-| Week 1-2  | Crawl dữ liệu        |
-| Week 3-4  | Processing           |
-| Week 5-6  | Indexing + Retrieval |
-| Week 7-8  | Evaluation           |
+* Giá nhỏ nhất
+* Giá lớn nhất
+* Trung bình (tuỳ chọn)
 
----
+Kết quả:
 
-## 🔥 12. Điểm nổi bật
-
-* Kết hợp Big Data + RAG
-* Dữ liệu thực tế (không phải benchmark sạch)
-* Có experiment rõ ràng
+> “Giá cà phê hôm nay dao động từ 118,000 đến 120,000 VND/kg tùy khu vực.”
 
 ---
 
-**Project này hướng tới việc xây dựng một hệ thống xử lý dữ liệu lớn hoàn chỉnh, không chỉ dừng lại ở mô hình AI.**
+## 8. 📊 Dữ liệu
+
+### Nguồn:
+
+* Báo chí Việt Nam
+* Website theo dõi giá nông sản
+
+### Loại dữ liệu:
+
+* Raw HTML (theo yêu cầu môn)
+* Văn bản đã xử lý
+* Dữ liệu có cấu trúc
+
+---
+
+## 9. ⚙️ Đánh giá tính khả thi
+
+### Dữ liệu
+
+* Public
+* Cập nhật thường xuyên
+
+### Phần cứng
+
+* Chạy được trên máy cá nhân
+* Không cần huấn luyện mô hình lớn
+
+### Độ phức tạp
+
+* Trung bình
+* Dùng công cụ có sẵn
+
+---
+
+## 10. 🚀 Đóng góp đề xuất
+
+So với bài báo nền tảng:
+
+* Áp dụng vào bài toán thực tế
+* Kết hợp **truy xuất lai (local + web)**
+* Thực hiện **tổng hợp đa nguồn**
+* Tăng độ tin cậy bằng **hiển thị nguồn**
+
+---
+
+## 11. 🧪 Kịch bản demo
+
+### Case 1: Truy vấn tĩnh
+
+> “Giá cà phê là gì?”
+> → Trả lời từ database
+
+### Case 2: Truy vấn realtime
+
+> “Giá cà phê hôm nay?”
+> → Lấy dữ liệu mới từ web + tổng hợp
+
+---
+
+## 12. 📌 Kết luận
+
+Đồ án thể hiện:
+
+* Mở rộng RAG sang dữ liệu động
+* Kết hợp realtime trong hệ thống Big Data
+* Tăng độ tin cậy bằng tổng hợp đa nguồn
+
+---
+
+## 13. 📎 Hướng phát triển
+
+* Dùng LLM để phân loại truy vấn
+* Đánh giá độ tin cậy nguồn
+* Mở rộng với Spark/Kafka
+
+---
+
+**Trạng thái:** Sẵn sàng nộp proposal ✅
