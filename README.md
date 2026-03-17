@@ -3,7 +3,9 @@
 ## 1. 📄 Bài báo nền tảng (Base Paper)
 
 **Tiêu đề:** RAG+: Enhancing Retrieval-Augmented Generation with Application-Aware Reasoning
+
 **Hội nghị:** EMNLP 2025 (CORE A)
+
 **Link:** [https://aclanthology.org/2025.emnlp-main.1630.pdf](https://aclanthology.org/2025.emnlp-main.1630.pdf)
 
 ---
